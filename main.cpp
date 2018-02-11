@@ -53,17 +53,17 @@ int main(void) {
     }
 
     //Вычислим через Spline и Seval
-    double spl_x[nodeDigit], spl_y[nodeDigit], spl_b[nodeDigit], spl_c[nodeDigit], spl_s[nodeDigit];
+    double spl_x[nodeDigit], spl_y[nodeDigit], spl_b[nodeDigit], spl_c[nodeDigit], spl_d[nodeDigit];
     double ResultSpline[nodeDigit];
     for (int i = 0; x < max_x; i++) {
         spl_x[i] = x;
         spl_y[i] = Function(x);
         x += h;
     }
-    spline(nodeDigit, spl_x, spl_y, spl_b, spl_c, spl_s);
+    spline(nodeDigit, spl_x, spl_y, spl_b, spl_c, spl_d);
     x = 0;
     for (int i = 0; x < max_x; i++) {
-        ResultSpline[i] = seval(11, &x, spl_x, spl_y, spl_b, spl_c, spl_s);
+        ResultSpline[i] = seval(11, &x, spl_x, spl_y, spl_b, spl_c, spl_d);
         x += h;
     }
 
