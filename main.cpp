@@ -1,4 +1,10 @@
-//Пример: считаем  в точках 0.1+0.2*к при пом. QUANC8,затем при пом.п. Лагранжа
+/*
+Для 0=<x<=2 с шагом  h=0.2  вычислить значения функции  f(x)
+с использованием программы  QUANC8, где  f(x)= .
+По полученным точкам построить сплайн-функцию и полином Лагранжа 10-й степени.
+Сравнить значения сплайн-функции и полинома с точным значением  f(x)
+(вычислить интеграл аналитически) в точках  xk=(k - 0.5) h  для  k=1,2,…10.
+*/
 #include <stdio.h>
 #include "quanc8.h"
 #include "lagrange.h"
@@ -6,78 +12,53 @@
 #include <math.h>
 #include <iostream>
 
-double x = 0;
-const double min_x=0;
-const double max_x = 2;
-const double h = 0.2;
-const int nodeDigit = 11;
 
-// Функция (для Quanc8)
+// Исходная функция
 double Function(double t) {
-    return exp(x * t) * sin(t);
+    return exp(t) * sin(t);
 }
 
 using namespace std;
 
-int main(void) {
-    double a = 0, b = 1, abserr = 1.0e-12, relerr = 0, errest, flag;
-    int nofun;
-
-    // считаем при помощи QUANC8
-    double ResultQUANC8[nodeDigit];
-    x = min_x;
-    for (int i = 0; x < max_x; i++) {
-        quanc8(Function, a, b, abserr, relerr, &ResultQUANC8[i], &errest, &nofun, &flag);
-        x += h;
+int main() {
+    //Исходные данные
+    const double min_x = 0,max_x=2,h=0.2;
+    int nodeDigit = (max_x-min_x)/h;
+    double x[nodeDigit], y[nodeDigit];
+    //Значения функции в заданных точках
+    for (int i = 0; i < nodeDigit; ++i) {
+        x[i] = h * i;
+        y[i] = Function(x[i]);
     }
 
-    // вычисл.Х[i],Y[i] для полинома Лагранжа
-    double lagrangeX[nodeDigit], lagrangeY[nodeDigit];
-    double ResultsLagr[nodeDigit];
-    x = min_x;
-    for (int i = 0; x < max_x; i++) {
-        lagrangeX[i] = x;
-        x += h;
-    }
-    //TODO
-    x = min_x;
-    for (int i = 0; x < max_x; i++) {
-        quanc8(Function, a, b, abserr, relerr, &lagrangeY[i], &errest, &nofun, &flag);
-        x += h;
-    }
-    //считаем при помощи полинома Лагранжа
-    x = min_x;
-    for (int i = 0; x < max_x; i++) {
-        ResultsLagr[i] = lagrange(10, lagrangeX, lagrangeY, x);
-        x += h;
+    //Коэфициенты
+    double b[nodeDigit-1], c[nodeDigit-1], d[nodeDigit-1];
+
+    spline(nodeDigit-1, x, y, b, c, d);
+
+
+    //Три массива для результатов
+    double resultDefault[nodeDigit];
+    double resultLagrange[nodeDigit];
+    double resultSpline[nodeDigit];
+    //В цикле считаем сразу тремя способами
+    for (int i = 0; i < nodeDigit-1; ++i) {
+        double point = min_x + i * h;
+        resultDefault[i] = Function(point);
+        resultLagrange[i] = lagrange(nodeDigit-1, x, y, point);
+        resultSpline[i] = seval(nodeDigit-1, &point, x, y, b, c, d);
     }
 
-    //Вычислим через Spline и Seval
-    double spl_x[nodeDigit], spl_y[nodeDigit], spl_b[nodeDigit], spl_c[nodeDigit], spl_d[nodeDigit];
-    double ResultSpline[nodeDigit];
-    for (int i = 0; x < max_x; i++) {
-        spl_x[i] = x;
-        spl_y[i] = Function(x);
-        x += h;
+    printf("-----------------------------------------------------\n");
+    printf("# |  x   |    Values    |   Lagrange   |    Spline\n");
+    printf("-----------------------------------------------------\n");
+    for (int i = 0; i < nodeDigit-1; ++i) {
+        printf("%-*.d| ", 2, i + 1);
+        printf("%.2f | ", x[i] + h);
+        printf("%.10f | ", resultDefault[i]);
+        printf("%.10f | ", resultLagrange[i]);
+        printf("%.10f", resultSpline[i]);
+        printf("\n");
     }
-    spline(nodeDigit, spl_x, spl_y, spl_b, spl_c, spl_d);
-    x = 0;
-    for (int i = 0; x < max_x; i++) {
-        ResultSpline[i] = seval(11, &x, spl_x, spl_y, spl_b, spl_c, spl_d);
-        x += h;
-    }
-
-
-
-
-    //Вывод
-    cout << "      QUANC8    Lagrange    Spline" << endl;
-    x = 0;
-
-    for (int i = 0; x < max_x; i++) {
-        cout << x << "  " << ResultQUANC8[i] << "  " << ResultsLagr[i] << "  " << ResultSpline[i] << endl;;
-        x += h;
-    }
-
     return 0;
 }
