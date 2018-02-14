@@ -47,19 +47,19 @@ int main() {
     spline(nodeDigit-1, x, y, b, c, d);
 
     for (int k = 0; k < nodeDigit; ++k) {
-        double i=((k+1)-0.5)*h;
-        current_x = i;
+        double xk=((k+1)-0.5)*h;
+        current_x = xk;
         quanc8(Function, down, up, abserr, relerr, &defaultFunction[k], &errest, nofun, &flag);
-        lagrangeFunction[k] = lagrange(nodeDigit-1, x, y, i);
-        splineFunction[k] = seval(nodeDigit-1, &i, x, y, b, c, d);
+        lagrangeFunction[k] = lagrange(nodeDigit-1, x, y, xk);
+        splineFunction[k] = seval(nodeDigit-1, &xk, x, y, b, c, d);
     }
 
 
     printf("-----------------------------------------------------\n");
-    printf("# |  x   |    Values    |   Lagrange   |    Spline\n");
+    printf("k |  xk   |    Values    |   Lagrange   |    Spline\n");
     printf("-----------------------------------------------------\n");
     for (int k = 0; k < nodeDigit; ++k) {
-        printf("%-*.d| ", 2, k);
+        printf("%-*.d| ", 2, k+1);
         printf("%.2f | ", ((k+1)-0.5)*h);
         printf("%.10f | ",defaultFunction[k]);
         printf("%.10f | ", lagrangeFunction[k]);
