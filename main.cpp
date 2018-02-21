@@ -55,7 +55,7 @@ int main() {
         splineFunction[k] = seval(secondNodeDigit, &xk, x, y, b, c, d);
     }
 
-
+    //Вывод значения функций
     printf("-----------------------------------------------------\n");
     printf("k |  xk   |    Values    |   Lagrange   |    Spline\n");
     printf("-----------------------------------------------------\n");
@@ -68,16 +68,16 @@ int main() {
         printf("\n");
     }
 
-    //Проверка погрешности
-    for (int i = 0; i < secondNodeDigit; ++i) {
-        double acceptValue = 0.1;
-        if (abs(defaultFunction[i] - lagrangeFunction[i]) > acceptValue ||
-            abs(defaultFunction[i] - splineFunction[i])>acceptValue) {
-            printf("Error in point k=" ,i);
-            printf("\n");
-        }
-
+    //Вывод значения погрешностей
+    printf("|k |  xk   |   Lagrange  |   Spline    |\n");
+    for (int k = 0; k < secondNodeDigit; ++k) {
+        printf("%-*.d| ", 2, k + 1);
+        printf("%.2f | ", ((k + 1) - 0.5) * h);
+        printf("%.10f | ", abs(defaultFunction[k] - lagrangeFunction[k]));
+        printf("%.10f | ", abs(defaultFunction[k] - splineFunction[k]));
+        printf("\n");
     }
+
 
 }
 
